@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agrimart - Add Product</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/edit_product.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage_buyer.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+
+    <!-- Header -->
+    <header class="top-bar">
+        <div class="logo">
+            <img src="/static/images/logo.png" alt="Agrimart Logo" class="logo-icon">
+            Agrimart
+        </div>          
+        <div class="tagline">Connecting you to Local Farmers</div>
+    </header>
+
+
+    <!-- Navigation -->
+    <nav class="nav-menu">
+        <ul>
+          <li><a href="/homepage_seller">Home</a></li>
+          <li><a href="#contacts">Contacts</a></li>
+        </ul>
+        </ul>
+    </nav>
+
+
+    <!-- Breadcrumb and User Menu -->
+    <nav class="main-nav">
+        <ul class="breadcrumb">
+            <li><a href="/index"><i class="fas fa-home"></i></a></li>
+            <li>›</li>
+            <li><a href="/homepage_seller" class="button">Add Product</a></li>
+        </ul>
+
+
+        <div class="icons">
+      <div class="user-dropdown" id="userDropdown">
+        <span class="user" id="userIcon"><i class="fas fa-user"></i></span>
+        <div class="user-menu" id="userMenu">
+          
+          <form action="{{ url_for('homepage_seller.logout') }}" method="post">
+            <button class="logout-btn" type="submit">Logout</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    </nav>
+
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="status">
+                <h3>SELLER MENU</h3>
+                <ul class="status-list">
+                    <li>
+                        <form action="/homepage_seller" method="get">
+                            <button type="submit" class="status-item">
+                                <i class="fas fa-home"></i> Homepage
+                            </button>
+                        </form>
+                    </li>
+                    <li>
+                        <form action="{{ url_for('seller_orders.unpaid_orders') }}" method="get">
+                            <button type="submit" class="status-item">
+                                <i class="fas fa-receipt"></i> Orders
+                            </button>
+                        </form>
+                    </li>
+                    <li>
+                        <form action="/add_product" method="get">
+                            <button type="submit" class="status-item">
+                                <i class="fas fa-plus-circle"></i> Add Product
+                            </button>
+                        </form>
+                    </li>
+                    <li>
+                        <form action="/payment_options" method="get">
+                            <button type="submit" class="status-item">
+                                <i class="fas fa-credit-card"></i> Payment Options
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+
+        <!-- Product Edit Form -->
+       <!-- Product Edit Form -->
+       <div class="product-info">
+        <h1>EDIT PRODUCT</h1>
+        <form method="post" action="{{ url_for('homepage_seller.edit_product', product_id=product['ProductID']) }}" enctype="multipart/form-data">
+            <div class="variation-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product</th>
+                            <th>Weight</th>
+                            <th>Packaging Length</th>
+                            <th>Packaging Width</th>
+                            <th>Packaging Height</th>
+                            <th>Shipping Fee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="image-upload-wrapper">
+                                    <input type="file" id="image_filename" name="Image" accept="image/*" onchange="previewImage()">
+                                    <div id="previewContainer">
+                                        <img id="imagePreview" src="{{ url_for('static', filename='images/products/' + product['ImageFilename']) }}" alt="Image Preview" style="max-width: 100px; max-height: 100px;">
+                                    </div>
+                                </div>
+                            </td>
+                            <td><input type="text" name="product_name" value="{{ product['Product_Name'] }}" required></td>
+                            <td><input type="text" name="weight" value="{{ product['Weight'] }}" required></td>
+                            <td><input type="text" name="packaging_length" value="{{ product['Packaging_Length'] }}" required></td>
+                            <td><input type="text" name="packaging_width" value="{{ product['Packaging_Width'] }}" required></td>
+                            <td><input type="text" name="packaging_height" value="{{ product['Packaging_Height'] }}" required></td>
+                            <td><input type="text" id="shipping_fee" name="shipping_fee" value="{{ product['Shipping_Fee'] }}" readonly></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                
+
+
+                <div class="outer-container">
+    <h2>Variations</h2>
+        {% for variation in variations %}
+            <div class="variation-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><br></th>
+                            
+                        </tr>
+                    </thead>
+                     <tbody>
+                        <tr>
+                            <td><input type="hidden" name="existing_variations[]" value="{{ variation['VariationID'] }}">
+                            <label for="unit">Unit:</label>
+                            <input type="text" id="unit" name="unit[]" value="{{ variation['Unit'] }}">
+                            </td>
+                        <td>
+                        <label for="price">Price:</label>
+            
+                        <input type="text" id="price" name="price[]" value="{{ variation['Price'] }}">
+                        </td>
+                        <td>
+                        <label for="quantity">Quantity:</label>
+                    
+                        <input type="text" id="quantity" name="quantity[]" value="{{ variation['Quantity'] }}">
+                        </td>
+                
+                        <td>
+                        <label for="delete_variation"></label>
+                
+                        <input type="hidden" name="delete_variation[]" value="{{ variation['VariationID'] }}">
+                        <button type="submit" class="delete-variation-button" name="delete_variation_button_{{ variation['VariationID'] }}">Delete</button>
+                        </td>
+                        </tr>
+                     </tbody>
+                </table>
+                    
+            </div>
+        {% endfor %}
+
+
+
+
+
+
+
+                <!-- Container for new variations -->
+                <div id="new-variation-container"></div>
+
+
+                <button type="button" class="button1" onclick="addNewVariation()">Add New Variation</button>
+                <input type="submit" value="Update Product" class="button1">
+            </div>
+            </div>  
+        </form>
+    </div>
+</div>
+
+
+<!-- Newsletter -->
+<section id="contacts" class="newsletter">
+    <div class="newsletter-content">
+      <div class="newsletter-text">
+        <h3><i class="fas fa-envelope"></i> Subscribe to our Newsletter</h3>
+        <p>Stay connected with the latest updates and local farm offers.</p>
+      </div>
+      <form class="newsletter-form">
+        <input type="email" placeholder="Your email address" required />
+        <button type="submit">Subscribe</button>
+      </form>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <div class="footer-about">
+        <img src="static/images/logo.png" alt="Agrimart Logo" class="logo-icon">
+        Agrimart
+        <p>Empowering farmers and connecting communities through sustainable commerce.</p>
+        <p><strong>09271674524</strong><br />agrimart@.com</p>
+      </div>
+      <div class="footer-columns">
+        <div>
+          <h5>My Account</h5>
+          <ul>
+            <li>My Account</li>
+            <li>Order History</li>
+            <li>Shopping Cart</li>
+            <li>Wishlist</li>
+          </ul>
+        </div>
+        <div>
+          <h5>Help</h5>
+          <ul>
+            <li>Contact</li>
+            <li>FAQs</li>
+            <li>Terms & Conditions</li>
+            <li>Privacy Policy</li>
+          </ul>
+        </div>
+        <div>
+          <h5>Proxy</h5>
+          <ul>
+            <li>About</li>
+            <li>Shop</li>
+            <li>Product</li>
+            <li>Track Order</li>
+          </ul>
+        </div>
+        <div>
+          <h5>Categories</h5>
+          <ul>
+            <li>Order History</li>
+            <li>Shopping Cart</li>
+            <li>Wishlist</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+ 
+<script>
+    
+    function addNewVariation() {
+    var container = document.getElementById('new-variation-container');
+    var div = document.createElement('div');
+
+
+    div.innerHTML =
+        `<div class="variations-container">
+            <div class="row">
+                <label for="new_unit">Unit:</label>
+                <input type="text" id="new_unit" name="new_unit[]">
+            </div>
+    
+            <div class="row">
+                <label for="new_price">Price:</label>
+                <input type="text" id="new_price" name="new_price[]">
+            </div>
+            <div class="row">
+                <label for="new_quantity">Quantity:</label>
+                <input type="text" id="new_quantity" name="new_quantity[]">
+            </div>
+        </div>`;
+
+
+    container.appendChild(div);
+}
+
+
+    function previewImage() {
+        var preview = document.getElementById('imagePreview');
+        var input = document.getElementById('image_filename');
+        var file = input.files[0];
+        var reader = new FileReader();
+
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+    }
+
+
+    function calculateShippingFee() {
+        const weight = parseFloat(document.getElementsByName("Weight")[0].value) || 0;
+        const length = parseFloat(document.getElementsByName("Packaging_Length")[0].value) || 0;
+        const width = parseFloat(document.getElementsByName("Packaging_Width")[0].value) || 0;
+        const height = parseFloat(document.getElementsByName("Packaging_Height")[0].value) || 0;
+
+
+        const volumetricWeight = (length * width * height) / 5000;
+        const shippingFee = Math.max(weight, volumetricWeight) * 50;
+
+
+        document.getElementById("shipping-fee").value = shippingFee.toFixed(2);
+    }
+
+
+    document.querySelectorAll("input[name='Weight'], input[name='Packaging_Length'], input[name='Packaging_Width'], input[name='Packaging_Height']")
+        .forEach(input => input.addEventListener("input", calculateShippingFee));
+
+
+    window.onload = calculateShippingFee;
+</script>
+
+<!-- JavaScript -->
+  <script>
+    document.querySelectorAll('.category-option input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        this.closest('form').submit();
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const userIcon = document.getElementById('userIcon');
+      const userMenu = document.getElementById('userMenu');
+ 
+      userIcon.addEventListener('click', function (event) {
+        userMenu.classList.toggle('show');
+        event.stopPropagation(); // Prevents event from bubbling up
+      });
+ 
+      // Close the dropdown if clicked outside
+      document.addEventListener('click', function (event) {
+        if (!userMenu.contains(event.target)) {
+          userMenu.classList.remove('show');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
